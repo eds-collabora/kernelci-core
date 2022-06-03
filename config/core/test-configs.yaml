@@ -374,6 +374,12 @@ test_plans:
       kselftest_collections: "kvm"
     filters: *kselftest_no_fragment
 
+  kselftest-landlock:
+    <<: *kselftest
+    params:
+      job_timeout: '10'
+      kselftest_collections: "landlock"
+
   kselftest-lib:
     <<: *kselftest
     params:
@@ -2179,6 +2185,7 @@ test_configs:
       - kselftest-filesystems
       - kselftest-futex
       - kselftest-kcmp
+      - kselftest-landlock
       - kselftest-lib
       - kselftest-membarrier
       - kselftest-mincore
@@ -2589,6 +2596,7 @@ test_configs:
       - kselftest-cpufreq
       - kselftest-futex
       - kselftest-kvm
+      - kselftest-landlock
       - kselftest-lib
       - kselftest-seccomp
       - ltp-crypto
@@ -2995,6 +3003,7 @@ test_configs:
       - kselftest-futex
       - kselftest-kcmp
       - kselftest-kvm
+      - kselftest-landlock
       - kselftest-lib
       - kselftest-membarrier
       - kselftest-mincore
