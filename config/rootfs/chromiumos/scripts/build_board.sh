@@ -59,6 +59,10 @@ echo "Patching octopus specific issue"
 sed -i s,'use fuzzer || die',"#use fuzzer || die", src/third_party/chromiumos-overlay/eclass/cros-ec-board.eclass
 fi
 
+# Disable SELinux in upstart and other packages to allow booting newer kernels on
+# CrOS images which don't define all selinux policies
+sed -i 's/selinux/-selinux/g' src/third_party/chromiumos-overlay/profiles/features/selinux/package.use
+
 # Temporary workaround as chrome-icu build fails at 10/08/2022 due corrupt git cache
 cros_sdk sync_chrome --tag=102.0.5005.171 --reset --gclient=/mnt/host/depot_tools/gclient /var/cache/chromeos-cache/distfiles/chrome-src --skip_cache
 
