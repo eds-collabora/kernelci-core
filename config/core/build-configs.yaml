@@ -275,6 +275,11 @@ fragments:
       - 'CONFIG_PINCTRL_AMD=y'
       - 'CONFIG_NVME_CORE=y'
       - 'CONFIG_BLK_DEV_NVME=y'
+      - 'CONFIG_NFS_V2=y'
+      - 'CONFIG_NFS_V3=y'
+      - 'CONFIG_NFS_V3_ACL=y'
+      - 'CONFIG_NFS_V4=y'
+      - 'CONFIG_ROOT_NFS=y'
 
   x86_kvm_guest:
     path: "kernel/configs/kvm_guest.config"
