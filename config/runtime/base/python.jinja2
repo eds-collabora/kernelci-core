@@ -63,7 +63,7 @@ class BaseJob:
         node = db.get_node(node_id)
         node.update({
             'result': result,
-            'status': 'complete',
+            'status': 'done',
         })
         db.submit({'node': node})
         return node
