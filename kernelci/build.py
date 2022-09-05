@@ -802,6 +802,28 @@ class Step:
         cmd = 'grep -cq CONFIG_{}=y {}'.format(config_name, dot_config)
         return shell_cmd(cmd, True)
 
+    def _kernel_config_getkey(self, opt_name):
+        dot_config = os.path.join(self._output_path, '.config')
+        with open(dot_config, 'r') as fp:
+            lines = fp.readlines()
+            for line in lines:
+                pcfg = line.strip().split('=')
+                if len(pcfg) > 1 and pcfg[0] == opt_name:
+                    return pcfg[1]
+        return False
+
+    def _kernel_config_setkey(self, opt_name, opt_value):
+        dot_config = os.path.join(self._output_path, '.config')
+        dot_confignew = os.path.join(self._output_path, '.confignew')
+        with open(dot_config, 'r') as fr, open(dot_confignew, 'w') as fw:
+            lines = fr.readlines()
+            for line in lines:
+                pcfg = line.strip().split('=')
+                if len(pcfg) > 1 and pcfg[0] == opt_name:
+                    line = f"{opt_name}={opt_value}\n"
+                fw.write(line)
+        os.replace(dot_confignew, dot_config)
+
     def _output_to_file(self, cmd, file_path, rel_path=None):
         with open(file_path, 'a') as output_file:
             output = ["#\n"]
@@ -1211,6 +1233,46 @@ scripts/kconfig/merge_config.sh -O {output} '{base}' '{frag}' {redir}
         return super().install(verbose)
 
 
+class FetchFirmware(Step):
+
+    @property
+    def name(self):
+        return 'firmware'
+
+    def run(self, jopt=None, verbose=False, opts=None):
+        """Fetch linux-firmware repository
+
+        If kernel have CONFIG_EXTRA_FIRMWARE enabled we need to fetch
+        fresh snapshot of linux-firmware git repository, otherwise
+        kernel will not be able to build
+        """
+        # CONFIG_EXTRA_FIRMWARE_DIR need absolute path
+        full_path = os.path.abspath(self._output_path)
+        fwdir = os.path.join(full_path, 'linux-firmware')
+        key = self._kernel_config_getkey('CONFIG_EXTRA_FIRMWARE')
+        if (key and len(key) < 3):
+            print("External firmware not required")
+            return False
+        if os.path.isdir(fwdir):
+            print("Firmware directory already present")
+        else:
+            print("Fetching firmware")
+            shell_cmd(f"""
+set -ex
+git clone --depth=1 \
+git://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git \
+{fwdir}
+""")
+        # We need to override directory where firmware stored
+        self._kernel_config_setkey('CONFIG_EXTRA_FIRMWARE_DIR',
+                                   f'"{fwdir}"')
+        bmeta = self._meta.get('bmeta')
+        fbmeta = bmeta.setdefault('firmware', dict())
+        fbmeta['commit'] = kernelci.build.head_commit(fwdir)
+
+        return self._add_run_step(True)
+
+
 class MakeKernel(Step):
 
     @property
@@ -1228,6 +1290,9 @@ class MakeKernel(Step):
         *verbose* is whether the build output should be shown
         """
         bmeta = self._meta.get('bmeta')
+        # Fetch linux firmware if this option enabled
+        # it means we need to have it ready to be embedded during build
+
         if self._kernel_config_enabled('XIP_KERNEL'):
             target = 'xipImage'
         elif self._kernel_config_enabled('SYS_SUPPORTS_ZBOOT'):
