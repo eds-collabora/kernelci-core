@@ -88,6 +88,10 @@ class KernelCI_API(Database):
         resp = self._get('/'.join(['node', node_id]))
         return json.loads(resp.text)
 
+    def get_nodes_count(self, attributes: dict = None):
+        """Get the count of all nodes matching attributes"""
+        return self._get('count', params=attributes)
+
     def get_nodes(self, attributes: dict = None):
         """Get all nodes matching attributes"""
         resp = self._get('nodes', params=attributes)
