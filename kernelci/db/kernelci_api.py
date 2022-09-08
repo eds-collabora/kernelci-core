@@ -81,6 +81,10 @@ class KernelCI_API(Database):
             self._filters.pop(sub_id)
         self._post(f'unsubscribe/{sub_id}')
 
+    def count_nodes(self, attributes: dict = None):
+        """Get the count of all nodes matching attributes"""
+        return self._get('count', params=attributes)
+
     def get_event(self, sub_id):
         path = '/'.join(['listen', str(sub_id)])
         while True:
