@@ -620,6 +620,14 @@ test_plans:
 
 device_types:
 
+  acer-cb317-1h-c3z6-dedede:
+    mach: x86
+    arch: x86_64
+    boot_method: depthcharge
+    filters: &x86-chromebook-filters
+      - passlist: {defconfig: ['x86-chromebook']}
+      - blocklist: {defconfig: ['allmodconfig', 'allnoconfig']}
+
   alpine-db:
     mach: alpine
     class: arm-dtb
@@ -757,9 +765,7 @@ device_types:
     mach: x86
     arch: x86_64
     boot_method: depthcharge
-    filters: &x86-chromebook-filters
-      - passlist: {defconfig: ['x86-chromebook']}
-      - blocklist: {defconfig: ['allmodconfig', 'allnoconfig']}
+    filters: *x86-chromebook-filters
 
   asus-C436FA-Flip-hatch:
     mach: x86
@@ -871,6 +877,18 @@ device_types:
     mach: davinci
     class: arm-dtb
     boot_method: uboot
+
+  dell-latitude-5400-4305U-sarien:
+    mach: x86
+    arch: x86_64
+    boot_method: depthcharge
+    filters: *x86-chromebook-filters
+
+  dell-latitude-5400-8665U-sarien:
+    mach: x86
+    arch: x86_64
+    boot_method: depthcharge
+    filters: *x86-chromebook-filters
 
   dove-cubox:
     mach: mvebu
@@ -1220,6 +1238,12 @@ device_types:
     class: arm64-dtb
     dtb: 'freescale/fsl-ls1028a-kontron-sl28-var3-ads2.dtb'
     boot_method: uboot
+
+  lenovo-TPad-C13-Yoga-zork:
+    mach: x86
+    arch: x86_64
+    boot_method: depthcharge
+    filters: *x86-chromebook-filters
 
   lenovo-hr330a-7x33cto1ww-emag:
     mach: arm64
@@ -1997,6 +2021,11 @@ device_types:
 
 test_configs:
 
+  - device_type: acer-cb317-1h-c3z6-dedede
+    test_plans:
+      - baseline
+      - baseline-nfs
+
   - device_type: alpine-db
     test_plans:
       - baseline
@@ -2211,6 +2240,16 @@ test_configs:
   - device_type: da850-lcdk
     test_plans:
       - baseline
+
+  - device_type: dell-latitude-5400-4305U-sarien
+    test_plans:
+      - baseline
+      - baseline-nfs
+
+  - device_type: dell-latitude-5400-8665U-sarien
+    test_plans:
+      - baseline
+      - baseline-nfs
 
   - device_type: dove-cubox
     test_plans:
@@ -2534,6 +2573,11 @@ test_configs:
 
   - device_type: lenovo-hr330a-7x33cto1ww-emag
     test_plans:
+      - baseline-nfs
+
+  - device_type: lenovo-TPad-C13-Yoga-zork
+    test_plans:
+      - baseline
       - baseline-nfs
 
   - device_type: meson-g12a-sei510
