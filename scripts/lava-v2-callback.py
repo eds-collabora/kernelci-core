@@ -58,7 +58,7 @@ TEST_CASE_STATUS_MAP = {
 
 def is_infra_error(cb):
     lava_yaml = cb['results']['lava']
-    lava = yaml.load(lava_yaml)
+    lava = yaml.load(lava_yaml, Loader=yaml.CLoader)
     stages = {s['name']: s for s in lava}
     job_meta = stages['job']['metadata']
     return job_meta.get('error_type') == "Infrastructure"
@@ -139,7 +139,7 @@ def handle_test(cb, full_case_name, verbose):
 
 def main(args):
     with open(args.json) as json_file:
-        cb = json.load(json_file)
+        cb = json.load(json_file, Loader=yaml.CLoader)
 
     if args.token and cb['token'] != args.token:
         print("Token mismatch")
